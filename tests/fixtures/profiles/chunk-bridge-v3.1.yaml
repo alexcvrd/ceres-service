@@ -1,0 +1,35 @@
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: chunk
+profile_id: chunk-bridge-v3.1
+output_schema_version: dds-loop-rag-chunks-v1
+window_tokens: 350
+overlap_tokens: 53
+tokenizer: unicode-whitespace-python-regex
+normalization_version: null
+eligibility_rule: located-unique-critical-exact-span-union-minus-explicit-redactions
+eligible_input_strategy: split-at-excluded-span
+gap_bridging: no_alphanumeric
+located_match_levels: [exact, normalized, fuzzy]
+require_unique_on_page: true
+fuzzy_max_char_error_rate: 0.02
+fuzzy_min_token_similarity: 0.98
+require_exact_critical_fields: true
+hard_exclusion_reasons:
+  - equation_unconfirmed
+  - page_furniture
+  - placeholder_element
+  - si_corruption
+  - table_unvalidated
+  - truncated_selection
+inherited_runner: ../dds003/ceres-rag-pilot-v1/build_snapshot_and_views.py
+inherited_runner_sha256: 181ce4b378887f6587949860090245f84f0d9c57fb37889d50c16a778da988bd
+env_lock: 00_control/requirements.lock
+env_lock_sha256: 4289e0efb67453c88bfbb48e1831deb633a9f55f67016b18d6a02ccc5ba00418
+hardware_flags: {device: cpu, deterministic: true}
+output_schemas:
+  chunks.jsonl: dds-loop-rag-chunks-v1
+  chunk-locators.jsonl: dds-loop-rag-chunk-locator-map-v1
+  source-locators.jsonl: dds-loop/locator/v1
+  source-lineage.jsonl: dds-loop/lineage/v1
+  ELIGIBILITY-AUDIT.json: dds-loop-rag-eligibility-audit-v1
+  keys.jsonl: dds-loop/keys/v1

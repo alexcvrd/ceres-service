@@ -1,0 +1,14 @@
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: index
+profile_id: inmem-exact-v1
+output_schema_version: dds-loop-rag-exact-index-v1
+metric: cosine
+top_k: 10
+tie_break: chunk_id-ascending
+normalization_version: l2-float32-v1
+inherited_runner: ../dds003/ceres-rag-pilot-v1/ceres-rag-platform-v0.1/development-retrieval-v0.1/rank_queries.py
+inherited_runner_sha256: af028370beb42393af3e17e2a9e187d2d59ef4f19218e7ada6172bba7cc9bfe5
+env_lock: 00_control/requirements.lock
+env_lock_sha256: 4289e0efb67453c88bfbb48e1831deb633a9f55f67016b18d6a02ccc5ba00418
+hardware_flags: {device: cpu, implementation: numpy, exact: true}
+output_schemas: {exact-results.jsonl: dds-loop-rag-exact-results-v1, keys.jsonl: dds-loop/keys/v1}

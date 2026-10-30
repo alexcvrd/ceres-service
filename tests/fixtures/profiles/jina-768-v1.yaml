@@ -1,0 +1,26 @@
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: embed
+profile_id: jina-768-v1
+output_schema_version: dds-loop-rag-embedding-matrices-v1
+hf_id: jinaai/jina-embeddings-v5-text-nano
+revision: 8a7f00aac812071b69403df470f1038ec85f8925
+dimension: 768
+document_encoding: {prompt_name: document, task: retrieval}
+query_encoding: {prompt_name: query, task: retrieval}
+normalization_version: l2-float32-v1
+model_weights_sha256: f07de152e254b5d03b1273e0bca0a11dfade686508503500d460813428539651
+tokenizer_sha256: 98d4a1d32152d6cedf85b5e88f3b205106dca1fe72aaab34e0ac13c238421069
+platform_config: ../dds003/ceres-rag-pilot-v1/jina-parity-v0.1/embedding_config.json
+platform_config_sha256: 06ca389b4384ab44216202bd7a38c9af78b9c22fc62a4e8312dd942ed236107c
+inherited_runner: ../dds003/ceres-rag-pilot-v1/extract_embeddings.py
+inherited_runner_sha256: e4478ec7b84e9729d2f102e25d38eb54c6d0b85654a11191117924f88c6b84f4
+interpreter: 04_rag/adapters/embed/.venv/bin/python   # dedicated embed venv (dev/claude 2026-09-03); pins match the inherited reranker-pilot venv
+env_lock: 04_rag/adapters/embed/requirements.lock
+env_lock_sha256: a0ecfe3eb5305e0034309cc93de2e18fae4991a9a4c226abe9a260c71167433d
+hardware_flags: {device: cuda, dtype: float16, output_dtype: float32, deterministic: true}
+output_schemas:
+  document-vectors.npy: numpy-float32-matrix-v1
+  document-rows.jsonl: dds-loop-rag-document-row-map-v1
+  query-vectors.npy: numpy-float32-matrix-v1
+  question-rows.jsonl: dds-loop-rag-question-row-map-v1
+  keys.jsonl: dds-loop/keys/v1

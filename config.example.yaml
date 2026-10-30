@@ -1,0 +1,102 @@
+# Template for config.yaml. Copy it, export the ${UPPER} placeholders, keep the copy out of git.
+# ${lower} placeholders are derived from this file itself (loop_root, runtime_root).
+# Secrets never live here: the DSN carries no password (libpq reads ~/.pgpass) and the API key
+# comes from the environment variable named by `api.api_key_env`. Any secret-looking value in this
+# file stops the service at startup.
+schema_version: ceres-config-v1
+
+api:
+  host: 127.0.0.1                  # loopback only; a public bind needs authenticated TLS in front
+  port: 8300
+  api_key_env: CERES_API_KEY       # the variable name, never the key
+  docs: false                      # /docs, /redoc and /openapi.json — all three, off by default
+  max_question_chars: 2000         # a longer question is 413
+  max_body_bytes: 65536
+  request_deadline_s: 360          # the client gets 504 after this; the run itself cannot be
+                                   # interrupted, finishes, and keeps its admission permit until then
+  admission:
+    max_inflight: 2                # one GPU answerer; a deeper queue only moves the wait
+    max_pending: 8                 # waiting requests beyond this are refused with 429 at once
+    queue_timeout_s: 30            # a waiting request gets 429 after this
+
+store:                             # CLI shape (store contract config fields)
+  dsn: postgresql://ceres_reader@db.invalid/veridian_rag   # example host; no password (~/.pgpass);
+                                   # read-only role `ceres_reader`
+  schema: ceres_serve_v0           # Ceres never creates, alters or drops it
+  serving_mode: rnd                # the ONE rights key, default `rnd`.
+                                   #   rnd        → serves redistributable, internal_research_only
+                                   #                and licensed works. R&D reads everything.
+                                   #   production → serves redistributable only, plus the licensed
+                                   #                works admitted one by one below.
+                                   # `serve_rights` is DERIVED from this key and must not appear in
+                                   # this file: a config that sets it is refused at startup. The
+                                   # mode is reported in /v1/info and in every answer's `meta`.
+                                   # Going to production needs a recorded compliance decision;
+                                   # the two keys below are then required:
+  # production_decision: <id>      # the id of the recorded decision that authorised production serving.
+  #                                # Required in production mode; refused as empty.
+  # admitted_licensed_works: []    # work ids of licensed works that decision admitted, served in
+  #                                # addition to redistributable. Only in production mode (rnd
+  #                                # serves every licensed work already, so a list here is refused).
+                                   # there is no `evidence_exclude_reasons` key any more —
+                                   # the read predicate is the active release, `evidence_eligible`
+                                   # and these rights. Flags travel into packet `warnings`.
+  statement_timeout_ms: 5000       # a slower query is cancelled by the server → 503 
+  pool_max_size: 4
+  pool_timeout_s: 10               # wait for a free pooled connection (exhausted pool, or the server
+                                   # unreachable) before the request becomes a store failure → 503
+  connect_timeout_s: 5             # libpq connect timeout per connection attempt
+                                   # no key. `production` also refuses items whose
+                                   # optional `evidence_basis` is `ocr_admitted_unverified`; `rnd` serves
+                                   # them, marks them in meta.citation_marks and logs every citation to
+                                   # <runtime_root>/logs/ocr-citations.jsonl (no runtime root → refused).
+
+endpoints:                         # CLI shape, verbatim fields
+  answerer:
+    protocol: openai-chat
+    base_url: http://127.0.0.1:8215/v1
+    health_url: http://127.0.0.1:8215/health
+    lifecycle: external            # in the reference setup this is the DDS loop's Qwen3.8 — never start a
+    resource: gpu                  # second copy, never stop a service you did not start
+    request_timeout_s: 300
+    expect_model: qwen38           # GET /v1/models must list it before /health says ready
+
+resources:
+  gpu:
+    lock: "${DDS_GPU_LOCK}"                    # host-wide lease, shared with the DDS CLI
+    state_dir: "${DDS_RUNTIME_ROOT}/services"  # the SAME directory the CLI uses, so a model one
+    max_concurrent_phases: 1                   # package started is `owned`, not `external`
+    idle_mib: 1500
+    devices: [0]
+
+route:
+  # served_route_file: <path>/s1.route.yaml   # the CLI-owned FROZEN served-route declaration; its
+                                   # `route_id` becomes the served id. Unset = `unassigned` in every
+                                   # answer. A declaration naming r1 (judged_route_id) is refused, and
+                                   # `served_route_id` is never written here by hand .
+  judged_route_id: 73c2e7911d632ad5602bb72f869d5be81a920343fdca9c204fe2a7d7a6bf7315   # r1
+  profiles:                        # paths are relative to this file
+    answer: tests/fixtures/profiles/grounded-qwen38-v1.yaml
+    # The other six r1 profiles ship with the fixture. Configuring them makes the service
+    # read their profile-controlled values (retrieve: pool, top-k, dedup rule; rerank: top-k) and
+    # report their hashes in /v1/info. They never decide the served route id:
+    # chunk:     tests/fixtures/profiles/chunk-bridge-v3.1.yaml
+    # represent: tests/fixtures/profiles/verbatim-v1.yaml
+    # embed:     tests/fixtures/profiles/jina-768-v1.yaml
+    # index:     tests/fixtures/profiles/inmem-exact-v1.yaml
+    # retrieve:  tests/fixtures/profiles/dense-top10-v2.yaml
+    # rerank:    tests/fixtures/profiles/qwen3-4b-rerank-v1.yaml
+  prompt_template: tests/fixtures/profiles/grounded_answer_v1.md   # checked against the profile's sha256
+
+# Memory v0. Off by default: with enabled false a
+# request carrying conversation_id/profile_id gets 422 and every request is the stateless route. a deployment config turns it on.
+# answer.situational_split (default false): split the asker's situation off a stateless question and retrieve with
+# the core question; needs memory.enabled. a deployment config turns it on under `answer:`.
+memory:
+  enabled: false
+  personas_dir: personas          # static fictional personas (<id>.yaml), stand-ins for user memory
+  # max_turns: 20  ttl_s: 7200  max_conversations: 1000  history_turns: 3  rewrite_max_tokens: 300  rewrite_timeout_s: 45
+
+paths:
+  loop_root: "${DDS_LOOP_ROOT}/loop-v0"        # read-only: profiles and question banks
+  runtime_root: "${CERES_RUNTIME_ROOT}" # raw answer events go to <runtime_root>/executions/<id>/raw

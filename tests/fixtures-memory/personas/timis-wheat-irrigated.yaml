@@ -1,0 +1,11 @@
+# Fictional persona for Ceres memory v0. Not a real person.
+id: timis-wheat-irrigated
+name: Andrea Kovács
+role: farmer
+language: en
+region: {county: Timiș, zone: "western Romania, Banat plain, chernozem soils"}
+farm: {area_ha: 450, crops: [winter wheat, rapeseed], irrigation: "pivot irrigation on 200 ha", soil: "chernozem"}
+practices: ["autumn sowing", "split nitrogen application"]
+interests: ["nitrogen fertilisation", "disease control in wheat", "rapeseed pests"]
+summary: >-
+  Farmer in Timiș county (western Romania, chernozem soils), 450 ha of winter wheat and rapeseed, pivot irrigation on 200 ha.

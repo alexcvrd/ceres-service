@@ -1,0 +1,12 @@
+route_schema_version: dds-loop-rag-route-v1
+route_name: r1
+route_id: 73c2e7911d632ad5602bb72f869d5be81a920343fdca9c204fe2a7d7a6bf7315   # recomputed 2026-09-04 14:10 (retrieve v2 dedup, T017) — dev/claude
+route_id_recipe: sha256(concatenated seven profile sha256 values in slot order)
+profiles:
+  chunk: 04_rag/profiles/chunk/chunk-bridge-v3.1.yaml
+  represent: 04_rag/profiles/represent/verbatim-v1.yaml
+  embed: 04_rag/profiles/embed/jina-768-v1.yaml
+  index: 04_rag/profiles/index/inmem-exact-v1.yaml
+  retrieve: 04_rag/profiles/retrieve/dense-top10-v2.yaml
+  rerank: 04_rag/profiles/rerank/qwen3-4b-rerank-v1.yaml
+  answer: 04_rag/profiles/answer/grounded-qwen38-v1.yaml

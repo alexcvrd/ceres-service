@@ -1,0 +1,19 @@
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: answer
+profile_id: grounded-qwen38-v1
+output_schema_version: dds-loop-rag-grounded-answers-v1
+model_alias: qwen38-q5-slice-answer-v1
+endpoint: http://127.0.0.1:8215/v1/chat/completions
+model_weights_sha256: 176a6a3f034e9cdc447c10cd00329fc9b31002e6589b9295f2ad4f1eefe0f6ab
+tokenizer_sha256: 176a6a3f034e9cdc447c10cd00329fc9b31002e6589b9295f2ad4f1eefe0f6ab
+prompt_template: 04_rag/prompts/grounded_answer_v1.md
+prompt_template_sha256: 7a37e08184ffd804fbc07da11296246ffe1479be74660cbb2be71a57ff7da0b4   # prompt v1 rewritten by dev/claude 2026-09-03: explicit enums + JSON skeleton (100 % structural failures before)
+answer_contract: ../dds003/ceres-rag-pilot-v1/answer-pilot-v0.2/CONTRACT.md
+answer_contract_sha256: 2b1e6747756ae9cfdbce0640281e538efc70eaff3c9475f8f40524050a85bdd1
+inherited_runner: ../dds003/ceres-rag-pilot-v1/ceres-rag-platform-v0.1/sealed-evaluation-v0.1/sealed-answer-pilot-v0.2/run_answers.py
+inherited_runner_sha256: bdcaa1565b060e5b697085ead3cc66587764a0bdf4fc219f9f203ad4b68e0e6e
+env_lock: 00_control/requirements.lock
+env_lock_sha256: 4289e0efb67453c88bfbb48e1831deb633a9f55f67016b18d6a02ccc5ba00418
+decoding: {temperature: 0.7, top_p: 0.8, top_k: 20, presence_penalty: 1.5, max_tokens: 700, maximum_attempts: 2, request_timeout_seconds: 300, enable_thinking: false}
+hardware_flags: {backend: llama.cpp-openai-server, device: cuda, context_tokens: 16384, gpu_layers: 99, cache_type_k: f16, cache_type_v: f16}
+output_schemas: {packets.jsonl: dds-loop-rag-grounded-packets-v1, answers.jsonl: dds-loop-rag-grounded-answers-v1, raw/*.json: openai-http-event-v1, keys.jsonl: dds-loop/keys/v1}

@@ -1,0 +1,12 @@
+# Fictional persona for Ceres memory v0. Not a real person.
+id: iasi-adjuster
+name: Mihai Rusu
+role: adjuster
+language: ro
+region: {county: Iași, zone: "north-eastern Romania, Moldavian plateau"}
+farm: null
+practices: []
+interests: ["assessing hail, drought and frost damage", "yield loss estimation", "crop growth stages at the time of damage"]
+summary: >-
+  Crop insurance field adjuster in Iași county (north-eastern Romania); assesses hail, drought and frost damage and yield loss.
+  Not a farmer: wants assessment criteria, not farming advice.

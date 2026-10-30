@@ -1,0 +1,14 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Set up the environment (installs and runs the smoke test)
+        run: bash setup_venv.sh
+      - name: Tests
+        run: .venv/bin/python -m pytest -q
+      - name: Demo (fake mode)
+        run: .venv/bin/python demo.py

@@ -1,0 +1,16 @@
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: represent
+profile_id: verbatim-v1
+output_schema_version: dds-loop-rag-representations-v1
+representation_kind: verbatim
+synthetic: false
+isolation_negative_control: stub
+inherited_runner: ../dds003/ceres-rag-pilot-v1/build_snapshot_and_views.py
+inherited_runner_sha256: 181ce4b378887f6587949860090245f84f0d9c57fb37889d50c16a778da988bd
+env_lock: 00_control/requirements.lock
+env_lock_sha256: 4289e0efb67453c88bfbb48e1831deb633a9f55f67016b18d6a02ccc5ba00418
+hardware_flags: {device: cpu, deterministic: true, network: denied}
+output_schemas:
+  representations.jsonl: dds-loop-rag-representations-v1
+  ISOLATION-AUDIT.json: dds-loop-rag-isolation-audit-v1
+  keys.jsonl: dds-loop/keys/v1

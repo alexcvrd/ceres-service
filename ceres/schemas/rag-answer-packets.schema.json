@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dds-loop/rag-answer-packets/v1",
+  "title": "answer slot packets (station 4: question + evidence-eligible contexts handed to the subject model; NOT the station-3 judge packet)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packet_id",
+    "question_id",
+    "question",
+    "language",
+    "contexts"
+  ],
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+-[0-9a-f]{64}$"
+    },
+    "question_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "contexts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "chunk_id",
+          "evidence_id",
+          "evidence_text",
+          "evidence_text_sha256",
+          "lineage_ids",
+          "locator_ids",
+          "parent_id",
+          "warnings"
+        ],
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "evidence_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_text": {
+            "type": "string"
+          },
+          "evidence_text_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "lineage_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "locator_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "parent_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_basis": {
+            "description": "carried from the chunk when present (admitted, unconfirmed scan OCR)",
+            "enum": [
+              "ocr_admitted_unverified"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

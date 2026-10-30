@@ -1,0 +1,118 @@
+[project]
+name = "ceres-service"
+version = "0.2.0"
+description = "Ceres v0 — grounded agronomy answers over the DDS serving store (route r1)"
+requires-python = ">=3.12"
+license = { text = "proprietary" }
+
+# numpy, psycopg, jsonschema and pyyaml are pinned to the versions the DDS loop uses, so the serving
+# side and the loop agree byte for byte (Ceres resolves its own lock; these four keep the loop's pins).
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "pydantic>=2",
+  "pyyaml==6.0.3",
+  "psycopg[binary,pool]==3.3.5",
+  "pgvector",
+  "numpy==2.5.2",
+  "jsonschema==4.26.0",
+  "httpx",
+]
+
+[project.optional-dependencies]
+# pgserver 0.1.4 = PostgreSQL 16.2 + pgvector 0.6.2 in a wheel, no root: the disposable store the
+# store tests start per session.
+dev = ["pytest", "pytest-asyncio", "httpx", "pgserver==0.1.4"]
+# The in-process jina-768 embedder and the Qwen3 reranker. Pins are copied
+# from the loop's embed/rerank venv lock, `loop-v0/04_rag/adapters/embed/requirements.lock`
+# (sha256 a0ecfe3e…, the `env_lock` both profiles name), so Ceres and the loop run the same stack.
+# Opt-in: the base install (`--extra dev`) stays torch-free and runs the whole suite on fakes.
+# torch comes from the PyTorch cu130 index on Linux (`[tool.uv.sources]` below), as the loop's does.
+models = [
+  "torch==2.12.0",
+  "transformers==5.2.0",
+  "sentence-transformers==5.7.0",
+  "tokenizers==0.22.2",
+  "safetensors==0.8.0",
+  "huggingface-hub==1.28.0",
+  "peft==0.20.0",
+  "accelerate==1.14.0",
+  "numpy==2.5.2",
+]
+
+[project.scripts]
+ceres-api = "ceres.api:main"
+ceres-eval = "ceres.eval:main"
+
+[tool.uv]
+# Transitive pins of the model stack, copied from the same loop lock, so `--extra models` resolves to
+# the loop's environment and not to whatever is newest. Packages the base install already locks
+# (anyio, numpy, pyyaml, …) keep the base lock's versions: the base install must not move.
+constraint-dependencies = [
+  "cloudpickle==3.1.2",
+  "cuda-bindings==13.3.1",
+  "cuda-pathfinder==1.8.1",
+  "cuda-toolkit==13.0.2",
+  "filelock==3.32.5",
+  "fsspec==2026.7.0",
+  "hf-xet==1.6.0",
+  "jinja2==3.1.6",
+  "joblib==1.6.0",
+  "markdown-it-py==4.2.0",
+  "markupsafe==3.0.3",
+  "mdurl==0.1.2",
+  "mpmath==1.3.0",
+  "narwhals==2.25.0",
+  "networkx==3.6.1",
+  "nvidia-cublas==13.1.1.3",
+  "nvidia-cuda-cupti==13.0.85",
+  "nvidia-cuda-nvrtc==13.0.88",
+  "nvidia-cuda-runtime==13.0.96",
+  "nvidia-cudnn-cu13==9.20.0.48",
+  "nvidia-cufft==12.0.0.61",
+  "nvidia-cufile==1.15.1.6",
+  "nvidia-curand==10.4.0.35",
+  "nvidia-cusolver==12.0.4.66",
+  "nvidia-cusparse==12.6.3.3",
+  "nvidia-cusparselt-cu13==0.8.1",
+  "nvidia-nccl-cu13==2.29.7",
+  "nvidia-nvjitlink==13.0.88",
+  "nvidia-nvshmem-cu13==3.4.5",
+  "nvidia-nvtx==13.0.85",
+  "regex==2026.9.3",
+  "rich==15.0.0",
+  "scikit-learn==1.9.0",
+  "scipy==1.18.1",
+  "setuptools==81.0.0",
+  "shellingham==1.5.4",
+  "sympy==1.14.0",
+  "threadpoolctl==3.6.0",
+  "tqdm==4.70.0",
+  "triton==3.7.0",
+  "typer==0.27.2",
+  "typer-slim==0.24.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu130", marker = "sys_platform == 'linux'" }]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ceres"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+  "live_store: read-only checks against the real serving store; skipped unless CERES_TEST_LIVE_DSN is set",
+  "models: loads the real Jina embedder / Qwen reranker weights on CPU; skipped unless CERES_TEST_MODELS=1",
+]
+filterwarnings = ["error::DeprecationWarning:ceres.*"]

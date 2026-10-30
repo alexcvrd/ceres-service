@@ -1,0 +1,76 @@
+# Ceres — template for serving the bundled route (hybrid search, prompt v3, five passages) against a DDS release.
+# Copy to config.yaml, set the ${UPPER} environment variables, keep the copy out of git.
+# ${lower} placeholders are derived from this file (loop_root, runtime_root). Relative paths resolve against this file's folder.
+# Secrets never live here: the DSN carries no password (libpq reads ~/.pgpass) and the API key comes from the environment
+# variable named by `api.api_key_env`. A secret-looking value in this file stops the service at startup.
+# For a quick look without a store, GPU or models, run `python demo.py` instead (fake mode).
+schema_version: ceres-config-v1
+
+api:
+  host: 127.0.0.1                  # loopback only; a public bind needs authenticated TLS in front
+  port: 8300
+  api_key_env: CERES_API_KEY       # the variable name, never the key
+  docs: false                      # /docs, /redoc and /openapi.json
+  max_question_chars: 2000         # a longer question is 413
+  max_body_bytes: 65536
+  request_deadline_s: 360          # the client gets 504 after this; the run itself finishes
+  admission:
+    max_inflight: 1                # one GPU answerer: one answer at a time
+    max_pending: 8                 # waiting requests beyond this get 429 at once
+    queue_timeout_s: 30            # a waiting request gets 429 after this
+
+store:                             # the DDS serving store (Postgres + pgvector), read-only
+  dsn: "${CERES_STORE_DSN}"        # e.g. postgresql://ceres_reader@db-host/veridian_rag (no password here)
+  schema: ceres_serve_v0           # created and loaded by the DDS CLI; Ceres never alters it
+  serving_mode: rnd                # rnd → redistributable, internal-research-only and licensed works;
+                                   # production → redistributable only, plus licensed works admitted below.
+                                   # Production needs a recorded rights decision and these two keys:
+  # production_decision: <decision id>
+  # admitted_licensed_works: []
+  statement_timeout_ms: 5000
+  pool_max_size: 4
+
+endpoints:
+  answerer:                        # an OpenAI-compatible chat server (e.g. llama-server) hosting the answer model
+    protocol: openai-chat
+    base_url: http://127.0.0.1:8215/v1
+    health_url: http://127.0.0.1:8215/health
+    lifecycle: external            # started and stopped outside Ceres
+    resource: gpu
+    request_timeout_s: 300
+    expect_model: qwen38           # GET /v1/models must list it before /health says ready
+
+resources:
+  gpu:
+    lock: "${CERES_GPU_LOCK}"                    # host-wide GPU lease file (shared with the DDS CLI when both run)
+    state_dir: "${CERES_RUNTIME_ROOT}/services"
+    max_concurrent_phases: 1
+    idle_mib: 1500
+    devices: [0]
+
+route:
+  served_route_file: "${loop_root}/04_rag/routes/s0hyb150-p3-v35h-r0013.yaml"   # bundled; its route_id is the served id
+  judged_route_id: 73c2e7911d632ad5602bb72f869d5be81a920343fdca9c204fe2a7d7a6bf7315   # reference route (reported only)
+  profiles:                        # the seven profiles of the served route; chunk/represent/embed must match the store
+    chunk: "${loop_root}/04_rag/profiles/chunk/chunk-bridge-v3.5-r0013.yaml"
+    represent: "${loop_root}/04_rag/profiles/represent/represent-v2.yaml"
+    embed: "${loop_root}/04_rag/profiles/embed/jina-768-v1.yaml"
+    index: "${loop_root}/04_rag/profiles/index/inmem-exact-v1.yaml"
+    retrieve: "${loop_root}/04_rag/profiles/retrieve/hybrid-union-v1.yaml"
+    rerank: "${loop_root}/04_rag/profiles/rerank/qwen3-0.6b-rerank-v6-in150.yaml"
+    answer: "${loop_root}/04_rag/profiles/answer/grounded-qwen38-v3-ctx8k.yaml"
+  prompt_template: "${loop_root}/04_rag/prompts/grounded_answer_v3.md"   # checked against the answer profile's sha256
+
+answer:
+  citation_mode: soft              # soft: a failed citation is dropped and the answer kept; strict: the answer is refused
+  situational_split: false         # split the asker's situation from the core question (needs memory.enabled)
+  source_titles: false             # return title, authors and PDF page per passage (needs paths.census_root)
+
+paths:
+  loop_root: ceres/assets/loop-v0                # bundled route assets (read-only)
+  runtime_root: "${CERES_RUNTIME_ROOT}"           # raw answer events go to <runtime_root>/executions/<id>/raw
+  # census_root: /path/to/dds/engine             # where the DDS release census lives, for source_titles
+
+memory:
+  enabled: false                   # opt-in conversation memory; requests without conversation_id stay stateless
+  personas_dir: personas           # static example personas

@@ -1,0 +1,19 @@
+# (s1-wide route). Unserved until promoted. Needs rerank top_k_input 150.
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: retrieve
+profile_id: hybrid-union-v1
+output_schema_version: dds-loop-rag-hits-v1
+hybrid_module: 04_rag/code/hybrid_v1.py
+hybrid_module_sha256: ccbf6b8bbc7bcf4212aedaf72b933c99f4765d2708f9114a7cd428b6cf1948e9
+legs:
+  dense: {depth: 500, score: cosine, ties: chunk_id_asc, survivors: 100}
+  lexical: {depth: 500, text: represented_text, corpus: all_release_rows, tokenizer: hybrid_v1.tokens, bm25: {k1: 1.2, b: 0.75}, ties: chunk_id_asc, zero_scores: excluded, survivors_examined: 50}
+read_predicate: filter_first
+fusion: {method: union_candidates_then_dedup, primary: dense, extra: lexical, extra_n: 50, max_pool: 150, order: dense_then_lexical, dedup: standard_over_concatenation}
+top_k_children: 150
+parent_deduplication: keep-best   # per leg, then again over the concatenation (dense first): lexical rows with a seen parent or a near-duplicate of a kept row are dropped
+near_duplicate_rule: {normalization: norm-v3, token_jaccard_min: 0.6, keep: higher_rank}
+min_context_tokens: 21
+candidate_pool: 500
+hardware_flags: {device: cpu, exact: true}
+output_schemas: {hits.jsonl: dds-loop-rag-hits-v1, retrieval-dedup.jsonl: dds-loop-rag-retrieval-dedup-v1, keys.jsonl: dds-loop/keys/v1}

@@ -1,0 +1,5 @@
+Additional rules for this request (situational v0):
+- The question describes the asker's own situation (place, soil, irrigation, farm). The reference passages were found for the general agronomic question.
+- When the passages support useful general guidance for the question but not its application to the asker's situation, give only that supported guidance, use "PARTIAL" with reason "PARTIAL_SUPPORT", add the sentence "This is general guidance; I cannot establish its applicability to your situation." (in Romanian: "Aceasta este o recomandare generală; nu pot stabili dacă se aplică situației dumneavoastră."), and list the unresolved situation in "missing_information". This sentence needs no citation; every agricultural statement still needs its citation. Do not decline only because the passages do not mention the asker's place or conditions.
+- Keep the passages' own qualifications (crop, place, season, trial); do not turn a single trial or a past season report into a recommendation for the asker.
+- Questions about prices, forecasts, contracts or laws keep the existing UNSUPPORTED rules.

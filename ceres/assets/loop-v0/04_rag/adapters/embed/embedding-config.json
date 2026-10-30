@@ -1,0 +1,18 @@
+{
+ "schema_version": "ceres-embedding-config-0.2.0",
+ "model_cache": "/path/to/huggingface-cache",
+ "models": [
+  {
+   "name": "jina-embeddings-v5-text-nano",
+   "hf_id": "jinaai/jina-embeddings-v5-text-nano",
+   "revision": "8a7f00aac812071b69403df470f1038ec85f8925",
+   "dtype": "float16",
+   "dimension": 768,
+   "batch_size": 8,
+   "max_seq_length": 8192,
+   "trust_remote_code": true,
+   "default_task": "retrieval",
+   "sentence_transformers_task_override": "retrieval"
+  }
+ ]
+}

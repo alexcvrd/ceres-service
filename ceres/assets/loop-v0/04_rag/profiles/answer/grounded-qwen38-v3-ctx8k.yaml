@@ -1,0 +1,20 @@
+# = grounded-qwen38-v2-ctx8k with prompt v3 (passage-scope rule; E1..En). English quality lever.
+# = grounded-qwen38-v1-ctx8k with prompt v2 (grounding, refusal and citation-copy rules; no "..." placeholders). Not served.
+# = grounded-qwen38-v1 with context 8192 and the vision projector off (answerer start: --ctx 8192 --no-vision), so the 0.6B reranker fits beside it (11/11 replies byte-identical to grounded-qwen38-v1 at the same request and seed; reranked packets peak 5.3k tokens).
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: answer
+profile_id: grounded-qwen38-v3-ctx8k
+output_schema_version: dds-loop-rag-grounded-answers-v1
+model_alias: qwen38-q5-slice-answer-v1
+endpoint: http://127.0.0.1:8215/v1/chat/completions
+model_weights_sha256: 176a6a3f034e9cdc447c10cd00329fc9b31002e6589b9295f2ad4f1eefe0f6ab
+tokenizer_sha256: 176a6a3f034e9cdc447c10cd00329fc9b31002e6589b9295f2ad4f1eefe0f6ab
+prompt_template: 04_rag/prompts/grounded_answer_v3.md
+prompt_template_sha256: b60d63ac087f6c00cbb92d79c10c0e26b97b63e364db85cbcd30fc387818d587   # prompt v3: v2 + passage-scope rule + any number of passages (English quality)
+answer_contract: ../dds003/ceres-rag-pilot-v1/answer-pilot-v0.2/CONTRACT.md
+answer_contract_sha256: 2b1e6747756ae9cfdbce0640281e538efc70eaff3c9475f8f40524050a85bdd1
+env_lock: 00_control/requirements.lock
+env_lock_sha256: 4289e0efb67453c88bfbb48e1831deb633a9f55f67016b18d6a02ccc5ba00418
+decoding: {temperature: 0.7, top_p: 0.8, top_k: 20, presence_penalty: 1.5, max_tokens: 700, maximum_attempts: 2, request_timeout_seconds: 300, enable_thinking: false}
+hardware_flags: {backend: llama.cpp-openai-server, device: cuda, context_tokens: 8192, vision: false, gpu_layers: 99, cache_type_k: f16, cache_type_v: f16}
+output_schemas: {packets.jsonl: dds-loop-rag-grounded-packets-v1, answers.jsonl: dds-loop-rag-grounded-answers-v1, raw/*.json: openai-http-event-v1, keys.jsonl: dds-loop/keys/v1}

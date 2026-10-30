@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dds-loop/rag-answers/v1",
+  "title": "answer slot rows (contract v0.2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_id",
+    "state",
+    "attempts"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "state": {
+      "enum": [
+        "VALIDATED",
+        "STRUCTURE_FAILED",
+        "TRANSPORT_FAILED"
+      ]
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidate": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "errors": {
+      "type": [
+        "array",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "VALIDATED"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "candidate"
+        ],
+        "properties": {
+          "candidate": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

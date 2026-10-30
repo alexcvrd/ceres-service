@@ -1,0 +1,39 @@
+# = qwen3-0.6b-rerank-v5-k8-in150 with top_k_output 5: the adopted route. Same top 5 as v5 (Ceres cut v5's 8 to its 5-wide packet), now stated honestly.
+# = qwen3-0.6b-rerank-v3 with top_k_output 8 (8 passages to the answerer). English quality lever: top_k_input 150 so the hybrid pool's 50 lexical extras reach the reranker.
+# = qwen3-0.6b-rerank-v2 + MARS issue boost after the rerank (held-back bulletins +0.088 [+0.024, +0.158], 0 lost).
+# = qwen3-0.6b-rerank-v1 with 100 candidates (S-RET top 5 +0.017 [+0.005, +0.029], rerank 1.14 s, peak 2.45 GB).
+# served reranker (judged +0.075 [+0.031, +0.122] vs
+# today). Same scoring as qwen3-4b-rerank-v3 (represented text, frozen instruction, query <= 256 / document <= 2048 tokens)
+# model Qwen3-Reranker-0.6B, batch 4 (the setting that fits beside the 27B answerer at --ctx 8192 --no-vision; fit-b/B).
+# NOTE: the loop's slot_adapter rerank slot runs only qwen3-reranker-4b; this profile is for Ceres serving (a loop run needs a code change).
+profile_schema_version: dds-loop-rag-slot-profile-v1
+slot: rerank
+profile_id: qwen3-0.6b-rerank-v6-in150
+output_schema_version: dds-loop-rag-hits-v1
+hf_id: Qwen/Qwen3-Reranker-0.6B
+revision: e61197ed45024b0ed8a2d74b80b4d909f1255473
+model_dir: ~/.cache/huggingface/hub/models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed45024b0ed8a2d74b80b4d909f1255473
+architecture: pointwise_causal_reranker
+instruction: "Given an agricultural user question, rank passages by whether they contain enough reliable information to answer the question."
+max_query_tokens: 256
+max_document_tokens: 2048
+batch_size: 4
+top_k_input: 150
+top_k_output: 5
+tie_break: pool_position   # a union hybrid pool has no single score order, so ties break by pool position
+rerank_text: represented
+on_oom: dense_order   # serve the dense order and record the fallback; never fail the request
+model_weights_sha256: 27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b
+weight_files_sha256:
+  model.safetensors: 27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b
+tokenizer_sha256: aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4
+interpreter: 04_rag/adapters/embed/.venv/bin/python
+env_lock: 04_rag/adapters/embed/requirements.lock
+env_lock_sha256: a0ecfe3eb5305e0034309cc93de2e18fae4991a9a4c226abe9a260c71167433d
+hardware_flags: {device: cuda, dtype: bfloat16, deterministic_order: true}
+output_schemas: {reranked-hits.jsonl: dds-loop-rag-hits-v1, keys.jsonl: dds-loop/keys/v1}
+issue_boost:              # after the rerank, before the evidence top 5: final = reranker logit + beta if a MARS candidate's issue matches the question's
+  beta: 2.0
+  window: same            # same year-month; a question naming only a year matches that year
+  date_reader: 04_rag/analytics/mars_dates.py   # question_issue + issue_of_parent; tests 04_rag/analytics/tests/test_mars_dates.py
+  date_reader_sha256: 76afe7bfd1dc8352611297405ecd98362bbe0dd8709b113df083aa600ed44882

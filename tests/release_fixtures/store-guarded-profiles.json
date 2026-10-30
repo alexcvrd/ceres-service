@@ -1,0 +1,5 @@
+{
+ "04_rag/profiles/chunk/chunk-bridge-v3.5-r0013.yaml": "a5ec76b8b5baea628dd3eef371488573fc881221a052c16aca01bc2d4840ae8d",
+ "04_rag/profiles/represent/represent-v2.yaml": "836900f2924f5c509c2c8b179da45670d2a28a759e0e3edd6c07c60757b9fdbe",
+ "04_rag/profiles/embed/jina-768-v1.yaml": "fecb1ee236be126938e1251d526588bbeacbbc1a73b8b664e52d5dd19e737ce2"
+}

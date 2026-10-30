@@ -1,0 +1,28 @@
+{
+  "purpose": "ONE real chunk-context row + its payload, copied verbatim (one JSONL line each).",
+  "chunk_id": "6a7af3c5e21bb95ae2a31185765c3fa019681ee82fb058fe6f2b61e472f4d643",
+  "parent_id": "mars-europe-2024-07-vol32-no7:section-0023",
+  "what": "JRC MARS Bulletin Vol. 32 No 7 (issued 2024-07-22), Poland block; the payload opens with the running header 'JRC MARS Bulletin Vol. 32 No 6 – 24 June 2024'.",
+  "page": "page_index 15 (0-based, from place.basis.derived_from and places_by_page) = page 16 (1-based)",
+  "context_manifest": {
+    "path": "<dds>/context-artifact/CONTEXT-MANIFEST.json",
+    "rule_version": "ctx-v35.2",
+    "chunk-context.jsonl_sha256": "038ec2f1de02825d4546336442689d2bae2576e62344ebd919d1b7e29321e43d",
+    "chunks_sha256": "71d8abe723c9d7934fe01207bff3da44489820f1e0a885c52dc69015536c3ca3"
+  },
+  "files": {
+    "chunk-context.jsonl": {
+      "source": "<dds>/context-artifact/chunk-context.jsonl",
+      "source_sha256": "038ec2f1de02825d4546336442689d2bae2576e62344ebd919d1b7e29321e43d",
+      "source_line": 4705,
+      "row_sha256": "c9cdaaebebff6b42540400e4bbb6cbe57caf37be48fdc830e4b5f556cc9b2161"
+    },
+    "candidate-chunks.jsonl": {
+      "source": "<dds>/context-artifact/candidate-chunks.jsonl",
+      "source_sha256": "71d8abe723c9d7934fe01207bff3da44489820f1e0a885c52dc69015536c3ca3",
+      "source_line": 15578,
+      "row_sha256": "e48ac1eb5341664cf0be28d441082bbc6e7fcd5df62238bdcf9e3bf931b74e53"
+    }
+  },
+  "copied_by": "copied verbatim from the DDS context artifact; the source paths above are relative to the DDS checkout"
+}

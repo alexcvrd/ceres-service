@@ -1,0 +1,51 @@
+{
+ "bodies": {
+  "1": {
+   "chat_template_kwargs": {
+    "enable_thinking": false
+   },
+   "max_tokens": 700,
+   "messages": [
+    {
+     "content": "SYS",
+     "role": "system"
+    },
+    {
+     "content": "Required answer language: en\n\nQuestion: q?\n\nPRIVATE REFERENCE MATERIAL START\n\n[E1]\n\nREFERENCE TEXT START\n\nSome passage text.\n\nREFERENCE TEXT END\n\nPRIVATE REFERENCE MATERIAL END\n\nReturn only the required JSON object.",
+     "role": "user"
+    }
+   ],
+   "model": "m",
+   "presence_penalty": 1.5,
+   "seed": 828617819,
+   "stream": false,
+   "temperature": 0.7,
+   "top_k": 20,
+   "top_p": 0.8
+  },
+  "2": {
+   "chat_template_kwargs": {
+    "enable_thinking": false
+   },
+   "max_tokens": 700,
+   "messages": [
+    {
+     "content": "SYS",
+     "role": "system"
+    },
+    {
+     "content": "Required answer language: en\n\nQuestion: q?\n\nPRIVATE REFERENCE MATERIAL START\n\n[E1]\n\nREFERENCE TEXT START\n\nSome passage text.\n\nREFERENCE TEXT END\n\nPRIVATE REFERENCE MATERIAL END\n\nReturn only the required JSON object.",
+     "role": "user"
+    }
+   ],
+   "model": "m",
+   "presence_penalty": 1.5,
+   "seed": 1541344563,
+   "stream": false,
+   "temperature": 0.7,
+   "top_k": 20,
+   "top_p": 0.8
+  }
+ },
+ "note": "Stateless (memory off) request bodies of ceres.llm.build_request_body for the inputs in tests/test_memory.py, pinned at the release cut (identical to the reference implementation the internal test compared with)."
+}

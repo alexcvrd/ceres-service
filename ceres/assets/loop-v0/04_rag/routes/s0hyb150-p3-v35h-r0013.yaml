@@ -1,0 +1,13 @@
+route_schema_version: dds-loop-rag-route-v1
+route_name: s0hyb150-p3-v35h-r0013
+route_id: a6f94ada3ea20a0f2d11bd4a737dbd95cbc6a8ae3ff312ca93af9552261972bf   # English quality levers: prompt v3 (passage-scope rule) + hybrid union first stage (dense 100 + lexical 50 → rerank 150) → 5 passages.
+rerank_text: represented   # rerank over the represented text
+route_id_recipe: sha256(concatenated seven profile sha256 values in slot order)
+profiles:
+  chunk: 04_rag/profiles/chunk/chunk-bridge-v3.5-r0013.yaml
+  represent: 04_rag/profiles/represent/represent-v2.yaml
+  embed: 04_rag/profiles/embed/jina-768-v1.yaml
+  index: 04_rag/profiles/index/inmem-exact-v1.yaml
+  retrieve: 04_rag/profiles/retrieve/hybrid-union-v1.yaml
+  rerank: 04_rag/profiles/rerank/qwen3-0.6b-rerank-v6-in150.yaml
+  answer: 04_rag/profiles/answer/grounded-qwen38-v3-ctx8k.yaml

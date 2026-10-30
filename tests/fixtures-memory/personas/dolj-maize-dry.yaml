@@ -1,0 +1,11 @@
+# Fictional persona for Ceres memory v0. Not a real person.
+id: dolj-maize-dry
+name: Ion Mărgărit
+role: farmer
+language: ro
+region: {county: Dolj, zone: "southern Romania, Oltenia plain, sandy soils near Dăbuleni"}
+farm: {area_ha: 120, crops: [maize, sunflower], irrigation: none, soil: "sandy, low water-holding capacity"}
+practices: ["conventional tillage", "spring sowing", "no-till trial on 10 ha"]
+interests: ["drought", "sowing dates and density", "crop insurance claims"]
+summary: >-
+  Farmer in Dolj county (southern Romania, sandy soils, drought-prone), 120 ha of maize and sunflower, no irrigation.
